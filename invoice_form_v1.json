@@ -1,0 +1,7 @@
+{
+  "fields": [
+    { "name": "invoice_number", "type": "text", "required": true },
+    { "name": "amount", "type": "number", "required": true },
+    { "name": "due_date", "type": "date", "required": true }
+  ]
+}

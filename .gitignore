@@ -1,0 +1,64 @@
+# Python-generated files
+__pycache__/
+*/__pycache__/*
+*.py[oc]
+
+# Distribution / packaging
+.Python
+build/
+downloads/
+lib/
+lib64/
+parts/
+sdist/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# dist/
+wheels/
+*.egg-info
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*env
+venv1/
+
+# C extensions
+*.so
+
+# JWT Keys - Security sensitive
+keys/
+*.pem
+*.key

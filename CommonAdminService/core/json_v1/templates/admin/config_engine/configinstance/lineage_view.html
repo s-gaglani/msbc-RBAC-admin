@@ -1,0 +1,381 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Config Engine | Lineage — {{ obj.config_key }}{% endblock %}
+
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bg-main:      hsl(240, 21%, 11%);
+        --bg-surface:   hsl(240, 21%, 15%);
+        --bg-panel:     rgba(30, 30, 46, 0.7);
+        --border-color: rgba(69, 71, 90, 0.4);
+        --text-primary: hsl(240, 20%, 97%);
+        --text-muted:   hsl(240, 10%, 70%);
+        --brand:        hsl(199, 89%, 48%);
+        --brand-glow:   rgba(33, 150, 243, 0.15);
+        --green:        #a6e3a1;
+        --yellow:       #f9e2af;
+        --red:          #f38ba8;
+        --mono:         'JetBrains Mono', 'Fira Mono', monospace;
+    }
+
+    body {
+        background-color: var(--bg-main) !important;
+        color: var(--text-primary) !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    h1, h2, h3 { color: var(--text-primary) !important; font-weight: 700 !important; }
+
+    #content { background: transparent !important; padding: 24px 40px !important; }
+
+    .breadcrumbs { background: var(--bg-surface) !important; border-bottom: 1px solid var(--border-color) !important; padding: 10px 40px !important; color: var(--text-muted) !important; }
+    .breadcrumbs a { color: var(--brand) !important; }
+
+    /* ── Summary Bar ── */
+    .summary-bar {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+    }
+    .summary-card {
+        background: var(--bg-panel);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 14px 20px;
+        backdrop-filter: blur(8px);
+        min-width: 160px;
+    }
+    .summary-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 4px; }
+    .summary-card .value { font-size: 20px; font-weight: 700; }
+
+    /* ── Timeline ── */
+    .timeline {
+        position: relative;
+        padding-left: 40px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 14px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, var(--brand), rgba(33,150,243,0.1));
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 24px;
+        animation: fadeIn 0.4s ease-out both;
+    }
+    .timeline-item:nth-child(1)  { animation-delay: 0.05s; }
+    .timeline-item:nth-child(2)  { animation-delay: 0.10s; }
+    .timeline-item:nth-child(3)  { animation-delay: 0.15s; }
+    .timeline-item:nth-child(4)  { animation-delay: 0.20s; }
+    .timeline-item:nth-child(5)  { animation-delay: 0.25s; }
+
+    /* dot on the line */
+    .timeline-dot {
+        position: absolute;
+        left: -33px;
+        top: 18px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid var(--brand);
+        background: var(--bg-main);
+        transition: background 0.2s;
+    }
+    .timeline-item.is-current .timeline-dot {
+        background: var(--brand);
+        box-shadow: 0 0 10px var(--brand-glow);
+    }
+    .timeline-item.scope-oob .timeline-dot  { border-color: var(--green); }
+    .timeline-item.scope-oob.is-current .timeline-dot { background: var(--green); }
+    .timeline-item.scope-user .timeline-dot { border-color: var(--yellow); }
+    .timeline-item.scope-user.is-current .timeline-dot { background: var(--yellow); }
+
+    /* card */
+    .timeline-card {
+        background: var(--bg-panel);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .timeline-card:hover { border-color: var(--brand); transform: translateX(4px); }
+    .timeline-item.is-current .timeline-card {
+        border-color: var(--brand);
+        box-shadow: 0 0 20px var(--brand-glow);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px;
+        background: rgba(255,255,255,0.03);
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .card-header-left { display: flex; align-items: center; gap: 10px; }
+
+    .scope-badge {
+        padding: 3px 10px;
+        border-radius: 60px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .scope-oob    { background: rgba(166,227,161,0.15); color: var(--green); }
+    .scope-tenant { background: rgba(33,150,243,0.15);  color: var(--brand); }
+    .scope-user   { background: rgba(249,226,175,0.15); color: var(--yellow); }
+
+    .active-badge {
+        padding: 3px 10px;
+        border-radius: 60px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+    .active-badge.active   { background: rgba(166,227,161,0.15); color: var(--green); }
+    .active-badge.inactive { background: rgba(243,139,168,0.15); color: var(--red); }
+
+    .current-badge {
+        padding: 3px 10px;
+        border-radius: 60px;
+        font-size: 11px;
+        font-weight: 700;
+        background: var(--brand);
+        color: white;
+    }
+
+    .card-meta {
+        display: flex;
+        gap: 24px;
+        padding: 14px 20px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .meta-item .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 2px; }
+    .meta-item .value { font-size: 13px; font-weight: 600; font-family: var(--mono); }
+
+    /* collapsible JSON */
+    .card-json {
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-json.open { max-height: 600px; }
+    .card-json pre {
+        margin: 0;
+        padding: 20px;
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.6;
+        color: #cdd6f4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow: auto;
+        max-height: 560px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--brand) transparent;
+    }
+
+    .toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .toggle-btn:hover { border-color: var(--brand); color: var(--brand); }
+
+    .action-links { display: flex; gap: 8px; align-items: center; }
+    .action-link {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        transition: all 0.2s;
+    }
+    .action-link:hover { border-color: var(--brand); color: var(--brand); }
+
+    /* ── Back button ── */
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 32px;
+        padding: 10px 20px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .back-btn:hover { background: var(--brand); border-color: var(--brand); color: white; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<div id="lineage-root">
+
+    {# ── Page Header ── #}
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px;">
+        <div>
+            <h1 style="font-size:32px; margin-bottom:4px;">{{ obj.config_key }}</h1>
+            <p style="color:var(--text-muted); font-size:14px; margin:0;">Full Configuration Lineage — all versions across all scopes</p>
+        </div>
+    </div>
+
+    {# ── Summary Bar ── #}
+    <div class="summary-bar">
+        <div class="summary-card">
+            <div class="label">Total Versions</div>
+            <div class="value">{{ instances|length }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Active</div>
+            <div class="value" style="color:var(--green);">
+                {% with active_count=0 %}
+                    {% for i in instances %}{% if i.is_active %}{% with active_count=active_count|add:1 %}{% endwith %}{% endif %}{% endfor %}
+                    {{ instances|length }}
+                {% endwith %}
+                {# simpler: count in template tag #}
+                {{ instances|length }}
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Config Key</div>
+            <div class="value" style="font-size:14px; font-family:var(--mono);">{{ obj.config_key }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Viewing From</div>
+            <div class="value" style="font-size:14px;">{{ obj.scope_type|upper }}{% if obj.scope_id %} : {{ obj.scope_id }}{% endif %}</div>
+        </div>
+    </div>
+
+    {# ── Timeline ── #}
+    <div class="timeline">
+        {% for instance in instances %}
+        <div class="timeline-item scope-{{ instance.scope_type }}{% if instance.pk == obj.pk %} is-current{% endif %}">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+
+                {# Header #}
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <span class="scope-badge scope-{{ instance.scope_type }}">{{ instance.scope_type }}</span>
+                        <span style="font-weight:700; font-size:14px;">v{{ instance.release_version }}</span>
+                        {% if instance.scope_id %}
+                            <span style="color:var(--text-muted); font-size:13px;">{{ instance.scope_id }}</span>
+                        {% endif %}
+                        {% if instance.pk == obj.pk %}
+                            <span class="current-badge">Current</span>
+                        {% endif %}
+                    </div>
+                    <div class="action-links">
+                        <span class="active-badge {% if instance.is_active %}active{% else %}inactive{% endif %}">
+                            {% if instance.is_active %}● Active{% else %}○ Inactive{% endif %}
+                        </span>
+                        {% if instance.scope_type != "oob" %}
+                            <a href="{% url 'admin:config_engine_configinstance_diff' instance.pk %}" class="action-link">View Diff</a>
+                        {% endif %}
+                        <a href="{% url 'admin:config_engine_configinstance_change' instance.pk %}" class="action-link">Edit</a>
+                        <button class="toggle-btn" onclick="toggleJson(this)">
+                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                            JSON
+                        </button>
+                    </div>
+                </div>
+
+                {# Meta row #}
+                <div class="card-meta">
+                    <div class="meta-item">
+                        <div class="label">ID</div>
+                        <div class="value" style="font-size:11px;">{{ instance.id }}</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="label">Created</div>
+                        <div class="value">{{ instance.created_at|date:"Y-m-d H:i" }}</div>
+                    </div>
+                    {% if instance.base_config_id %}
+                    <div class="meta-item">
+                        <div class="label">Base Config ID</div>
+                        <div class="value" style="font-size:11px;">{{ instance.base_config_id }}</div>
+                    </div>
+                    {% endif %}
+                    {% if instance.base_release_version %}
+                    <div class="meta-item">
+                        <div class="label">Base Release</div>
+                        <div class="value">{{ instance.base_release_version }}</div>
+                    </div>
+                    {% endif %}
+                    {% if instance.parent_config_instance_id %}
+                    <div class="meta-item">
+                        <div class="label">Parent</div>
+                        <div class="value" style="font-size:11px;">{{ instance.parent_config_instance_id }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {# Collapsible JSON #}
+                <div class="card-json">
+                    <pre>{{ instance.config_json|safe }}</pre>
+                </div>
+
+            </div>
+        </div>
+        {% empty %}
+        <div style="color:var(--text-muted); font-style:italic; padding:40px 0;">No config instances found for this key.</div>
+        {% endfor %}
+    </div>
+
+    <a href="../../" class="back-btn">
+        <svg fill="currentColor" width="16" height="16" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Return to Registry
+    </a>
+</div>
+
+<script>
+function toggleJson(btn) {
+    const card = btn.closest('.timeline-card');
+    const jsonPanel = card.querySelector('.card-json');
+    const isOpen = jsonPanel.classList.toggle('open');
+    btn.style.borderColor = isOpen ? 'var(--brand)' : 'var(--border-color)';
+    btn.style.color = isOpen ? 'var(--brand)' : 'var(--text-muted)';
+
+    // Pretty-print on first open
+    const pre = jsonPanel.querySelector('pre');
+    if (isOpen && pre && !pre.dataset.formatted) {
+        try {
+            const parsed = JSON.parse(pre.textContent);
+            pre.textContent = JSON.stringify(parsed, null, 2);
+        } catch (_) {}
+        pre.dataset.formatted = '1';
+    }
+}
+</script>
+{% endblock %}

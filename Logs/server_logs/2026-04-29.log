@@ -1,0 +1,13 @@
+2026-04-29 19:38:44 [INFO] GET /api/docs/ - Status: 404 - Duration: 0.006s - IP: 127.0.0.1
+2026-04-29 19:38:45 [INFO] GET /api/docs/ - Status: 404 - Duration: 0.006s - IP: 127.0.0.1
+2026-04-29 19:38:57 [INFO] GET / - Status: 404 - Duration: 0.006s - IP: 127.0.0.1
+2026-04-29 19:45:16 [INFO] GET /api/docs/ - Status: 404 - Duration: 0.009s - IP: 127.0.0.1
+2026-04-29 19:45:47 [INFO] GET /docs - Status: 404 - Duration: 0.007s - IP: 127.0.0.1
+2026-04-29 19:46:13 [INFO] GET /api/docs/ - Status: 404 - Duration: 0.010s - IP: 127.0.0.1
+2026-04-29 19:47:53 [INFO] GET /api/docs/ - Status: 500 - Duration: 0.207s - IP: 127.0.0.1
+2026-04-29 19:49:41 [INFO] GET /api/docs/ - Status: 200 - Duration: 0.019s - IP: 127.0.0.1
+2026-04-29 19:49:41 [INFO] GET /api/schema/ - Status: 500 - Duration: 0.067s - IP: 127.0.0.1
+2026-04-29 19:49:41 [INFO] GET /api/schema/ - Status: 500 - Duration: 0.038s - IP: 127.0.0.1
+2026-04-29 19:51:41 [INFO] GET /api/docs/ - Status: 200 - Duration: 0.017s - IP: 127.0.0.1
+2026-04-29 19:51:42 [INFO] GET /api/schema/ - Status: 200 - Duration: 0.089s - IP: 127.0.0.1
+2026-04-29 19:53:47 [INFO] POST /tenants/ - Status: 403 - Duration: 0.001s - IP: 127.0.0.1

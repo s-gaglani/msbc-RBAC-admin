@@ -1,0 +1,7 @@
+2026-05-01 11:15:13 [INFO] GET /api/doc/ - Status: 200 - Duration: 0.304s - IP: 127.0.0.1
+2026-05-01 11:15:14 [INFO] GET /api/schema/ - Status: 200 - Duration: 0.348s - IP: 127.0.0.1
+2026-05-01 11:15:43 [INFO] GET /admin/ - Status: 200 - Duration: 0.359s - IP: 127.0.0.1
+2026-05-01 11:15:49 [INFO] GET /admin/accounts/user/ - Status: 200 - Duration: 0.210s - IP: 127.0.0.1
+2026-05-01 11:15:49 [INFO] GET /admin/jsi18n/ - Status: 200 - Duration: 0.161s - IP: 127.0.0.1
+2026-05-01 11:16:16 [INFO] POST /api/auth/token/ - Status: 200 - Duration: 1.340s - IP: 127.0.0.1
+2026-05-01 11:16:44 [INFO] GET /sidebar/ - Status: 200 - Duration: 0.184s - IP: 127.0.0.1
