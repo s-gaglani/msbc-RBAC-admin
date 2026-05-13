@@ -1,7 +1,42 @@
 {
-  "fields": [
-    { "name": "invoice_number", "type": "text", "required": true },
-    { "name": "amount", "type": "number", "required": true },
-    { "name": "due_date", "type": "date", "required": true }
-  ]
+  "version": "1.0",
+  "form_id": "user_signup",
+  "sections": {
+    "basic_info": {
+      "label": "Basic Info",
+      "order": 1,
+      "fields": {
+        "username": {
+          "visible": true,
+          "required": true,
+          "type": "text"
+        },
+        "email": {
+          "visible": true,
+          "required": true,
+          "type": "email"
+        }
+      }
+    },
+    "preferences": {
+      "label": "Preferences",
+      "order": 2,
+      "fields": {
+        "language": {
+          "visible": true,
+          "required": true,
+          "type": "select",
+          "options": ["English", "Hindi", "Gujarati"]
+        },
+        "newsletter": {
+          "visible": true,
+          "required": false,
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "submission": {
+    "confirmation_email": true
+  }
 }

@@ -21,6 +21,7 @@ class TenantCreateSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8)
     tenant_name = serializers.CharField(max_length=255)
+    tenant_code = serializers.CharField(max_length=50)
     
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
@@ -32,8 +33,15 @@ class TenantCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError("Tenant name already exists")
         return value
     
+    def validate_tenant_code(self, value):
+        if Tenant.objects.filter(code=value).exists():
+            raise serializers.ValidationError("Tenant code already exists")
+        return value
+
+    
     def create(self, validated_data):
         tenant = Tenant.objects.create(
+            code=validated_data['tenant_code'],
             name=validated_data['tenant_name'],
             is_active=True
         )
